@@ -49,6 +49,12 @@ env:
   #signing keys env variable checks
   ANDROID_SIGNING_KEY: "${{ secrets.ANDROID_SIGNING_KEY }}"
   MACOS_P12_BASE64: "${{ secrets.MACOS_P12_BASE64 }}"
+  # Fork-local (openweb): the self-hosted rendezvous server + public key baked
+  # into the client by .github/patches/apply_selfhosted_pinning.py -- upstream
+  # dropped its compile-time hook at 1.4.9. (API_SERVER is derived from the
+  # rendezvous server now, so it is not needed.)
+  RS_PUB_KEY: "${{ secrets.RS_PUB_KEY }}"
+  RENDEZVOUS_SERVER: "${{ secrets.RENDEZVOUS_SERVER }}"
   UPLOAD_ARTIFACT: "${{ inputs.upload-artifact }}"
   SIGN_BASE_URL: "${{ secrets.SIGN_BASE_URL }}-2"
 
@@ -250,6 +256,11 @@ jobs:
         if: ${{ matrix.job.arch == 'aarch64' }}
         shell: bash
         run: echo "SODIUM_LIB_DIR=$VCPKG_ROOT/installed/${{ matrix.job.vcpkg-triplet }}/lib" >> "$GITHUB_ENV"
+
+      - name: Pin self-hosted rendezvous server and public key
+        # Fork-local (openweb); see .github/patches/apply_selfhosted_pinning.py
+        shell: bash
+        run: python3 .github/patches/apply_selfhosted_pinning.py
 
       - name: Build rustdesk
         run: |
@@ -804,6 +815,11 @@ jobs:
           rustup default
           cargo -V
           rustc -V
+
+      - name: Pin self-hosted rendezvous server and public key
+        # Fork-local (openweb); see .github/patches/apply_selfhosted_pinning.py
+        shell: bash
+        run: python3 .github/patches/apply_selfhosted_pinning.py
 
       - name: Build rustdesk
         run: |
