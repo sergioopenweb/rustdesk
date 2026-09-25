@@ -92,7 +92,9 @@ def clean(name: str, raw: str) -> str:
 
 
 def mask(value: str) -> str:
-    return value if len(value) <= 8 else value[:8] + "\u2026"
+    # Keep every log line pure ASCII: the Windows runner console mangles non-ASCII
+    # (and an unencodable char must never be able to fail the build from a print).
+    return value if len(value) <= 8 else value[:8] + "..."
 
 
 def apply(text: str, rendezvous: str, key: str) -> str:
