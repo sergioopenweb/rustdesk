@@ -1,0 +1,18 @@
+diff --git a/flutter/lib/desktop/pages/desktop_home_page.dart b/flutter/lib/desktop/pages/desktop_home_page.dart
+index 12951ca4..a15a6286 100644
+--- a/flutter/lib/desktop/pages/desktop_home_page.dart
++++ b/flutter/lib/desktop/pages/desktop_home_page.dart
+@@ -439,8 +439,11 @@ class _DesktopHomePageState extends State<DesktopHomePage>
+         await launchUrl(url);
+       };
+       if (isToUpdate) {
+-        onPressed = () {
+-          handleUpdate(updateUrl);
++        onPressed = () async {
++          // Openweb: the in-app updater only accepts RustDesk's signed update
++          // metadata, so a self-hosted build can never install itself. Send the
++          // user to the release page of our own build instead.
++          await launchUrl(Uri.parse(updateUrl));
+         };
+       }
+       return buildInstallCard(
